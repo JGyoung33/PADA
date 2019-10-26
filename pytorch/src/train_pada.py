@@ -281,15 +281,15 @@ def train(config):
         ad_net.train(True)
         weight_ad = torch.zeros(inputs.size(0))
         label_numpy = labels_source.data.cpu().numpy()
-        for j in range(inputs.size(0) / 2):
+        for j in range(int(inputs.size(0) / 2)):
             weight_ad[j] = class_weight[int(label_numpy[j])]
-        weight_ad = weight_ad / torch.max(weight_ad[0:inputs.size(0)/2])
-        for j in range(inputs.size(0) / 2, inputs.size(0)):
+        weight_ad = weight_ad / torch.max(weight_ad[0:int(inputs.size(0)/2)])
+        for j in range(int(inputs.size(0) / 2), inputs.size(0)):
             weight_ad[j] = 1.0            
         transfer_loss = transfer_criterion(features, ad_net, gradient_reverse_layer, \
                                            weight_ad, use_gpu)
 
-        classifier_loss = class_criterion(outputs.narrow(0, 0, inputs.size(0)/2), labels_source)
+        classifier_loss = class_criterion(outputs.narrow(0, 0, int(inputs.size(0)/2)), labels_source)
 
         total_loss = loss_params["trade_off"] * transfer_loss + classifier_loss
         total_loss.backward()
@@ -355,27 +355,27 @@ if __name__ == "__main__":
         config["data"] = {"source":{"list_path":args.s_dset_path, "batch_size":36}, \
                           "target":{"list_path":args.t_dset_path, "batch_size":36}, \
                           "test":{"list_path":args.t_dset_path, "batch_size":4}}
-        if "Real_World" in args.s_dset_path and "Art" in args.t_dset_path:
+        if "Real-World" in args.s_dset_path and "Art" in args.t_dset_path:
             config["softmax_param"] = 1.0
             config["optimizer"]["lr_param"]["init_lr"] = 0.0003
-        elif "Real_World" in args.s_dset_path:
+        elif "Real-World" in args.s_dset_path:
             config["softmax_param"] = 10.0
             config["optimizer"]["lr_param"]["init_lr"] = 0.001
         elif "Art" in args.s_dset_path:
             config["optimizer"]["lr_param"]["init_lr"] = 0.0003
             config["high"] = 0.5
             config["softmax_param"] = 10.0
-            if "Real_World" in args.t_dset_path:
+            if "Real-World" in args.t_dset_path:
                 config["high"] = 0.25
         elif "Product" in args.s_dset_path:
             config["optimizer"]["lr_param"]["init_lr"] = 0.0003
             config["high"] = 0.5
             config["softmax_param"] = 10.0
-            if "Real_World" in args.t_dset_path:
+            if "Real-World" in args.t_dset_path:
                 config["high"] = 0.3
         else:
             config["optimizer"]["lr_param"]["init_lr"] = 0.0003
-            if "Real_World" in args.t_dset_path:
+            if "Real-World" in args.t_dset_path:
                 config["high"] = 0.5
                 config["softmax_param"] = 10.0
                 config["loss"]["update_iter"] = 1000
@@ -400,4 +400,14 @@ if __name__ == "__main__":
         config["optimizer"]["lr_param"]["init_lr"] = 0.001
         config["loss"]["update_iter"] = 500
         config["network"]["params"]["class_num"] = 256
+    
+    elif config["dataset"] == "image-clef":
+        config["data"] = {"source":{"list_path":args.s_dset_path, "batch_size":36}, \
+                          "target":{"list_path":args.t_dset_path, "batch_size":36}, \
+                          "test":{"list_path":args.t_dset_path, "batch_size":4}}
+        
+        config["network"]["params"]["class_num"] = 12
+        config["loss"]["update_iter"] = 500
+        config["optimizer"]["lr_param"]["init_lr"] = 0.001
+
     train(config)
