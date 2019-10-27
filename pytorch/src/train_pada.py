@@ -226,7 +226,9 @@ def train(config):
 
     ## train   
     len_train_source = len(dset_loaders["source"]) - 1
+    print(len_train_source)
     len_train_target = len(dset_loaders["target"]) - 1
+    print(len_train_target)
     transfer_loss_value = classifier_loss_value = total_loss_value = 0.0
     best_acc = 0.0
     for i in range(config["num_iterations"]):
@@ -402,13 +404,13 @@ if __name__ == "__main__":
         config["network"]["params"]["class_num"] = 256
     
     elif config["dataset"] == "image-clef":
-        
+        print('Done')
         config["data"] = {"source":{"list_path":args.s_dset_path, "batch_size":36}, \
                           "target":{"list_path":args.t_dset_path, "batch_size":36}, \
                           "test":{"list_path":args.t_dset_path, "batch_size":4}}
         
         config["network"]["params"]["class_num"] = 12
         config["loss"]["update_iter"] = 500
-        config["optimizer"]["lr_param"]["init_lr"] = 0.00031
+        config["optimizer"]["lr_param"]["init_lr"] = 0.001
 
     train(config)
