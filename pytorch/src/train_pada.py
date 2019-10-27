@@ -402,12 +402,13 @@ if __name__ == "__main__":
         config["network"]["params"]["class_num"] = 256
     
     elif config["dataset"] == "image-clef":
+        
         config["data"] = {"source":{"list_path":args.s_dset_path, "batch_size":36}, \
                           "target":{"list_path":args.t_dset_path, "batch_size":36}, \
                           "test":{"list_path":args.t_dset_path, "batch_size":4}}
         
         config["network"]["params"]["class_num"] = 12
         config["loss"]["update_iter"] = 500
-        config["optimizer"]["lr_param"]["init_lr"] = 0.001
+        config["optimizer"]["lr_param"]["init_lr"] = 0.00031
 
     train(config)
